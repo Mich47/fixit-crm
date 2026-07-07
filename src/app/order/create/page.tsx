@@ -1,5 +1,6 @@
 "use client";
 
+import { createOrder } from "@/app/services/orderService";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import axios from "axios";
 import { useState } from "react";
@@ -22,7 +23,7 @@ export default function CreateOrderPage() {
     setMessage("");
 
     try {
-      const response = await axios.post("/api/orders", {
+      const response = await createOrder({
         clientName: `${firstName} ${lastName}`,
         clientPhone,
         deviceModel,
