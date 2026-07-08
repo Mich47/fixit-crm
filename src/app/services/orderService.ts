@@ -1,9 +1,22 @@
 import { Order } from "@/generated/prisma/client";
 import axios from "axios";
 
-// const handleAxiosError = (error: unknown, defaultMessage: string): string => {
-//     let errorMessage = defaultMessage;
-// }
+const handleAxiosError = (error: unknown, defaultMessage: string): string => {
+  let errorMessage = defaultMessage;
+  // 1. Перевіряємо, чи помилка прийшла саме від Axios
+  if (axios.isAxiosError(error)) {
+    // За допомогою безпечного приведення типів (as) дістаємо текст помилки з нашого сервера
+    const serverData = error.response?.data as { error?: string };
+    errorMessage = serverData?.error || error.message;
+  }
+  // 2. Якщо це звичайна помилка JavaScript (наприклад, збій мережі)
+  else if (error instanceof Error) {
+    errorMessage = error.message;
+  }
+
+  return errorMessage;
+};
+
 export const updateOrderStatus = async (
   orderId: string,
   newStatus: string,
@@ -12,7 +25,12 @@ export const updateOrderStatus = async (
     await axios.patch(`/api/orders/${orderId}`, { status: newStatus });
   } catch (error) {
     console.error("Помилка сервісу при оновленні статусу: ", error);
-    throw error; // Прокидаємо помилку далі, щоб її можна було обробити на фронтенді
+    const errorMessage = handleAxiosError(
+      error,
+      "Сталася помилка при оновленні статусу.",
+    );
+
+    throw new Error(errorMessage);
   }
 };
 
@@ -33,18 +51,12 @@ export const createOrder = async ({
     console.log("Відповідь сервера:", response.data);
     return response.data;
   } catch (error) {
-    let errorMessage = "Сталася помилка при створенні заявки.";
-    // 1. Перевіряємо, чи помилка прийшла саме від Axios
-    if (axios.isAxiosError(error)) {
-      // За допомогою безпечного приведення типів (as) дістаємо текст помилки з нашого сервера
-      const serverData = error.response?.data as { error?: string };
-      errorMessage = serverData?.error || error.message;
-    }
-    // 2. Якщо це звичайна помилка JavaScript (наприклад, збій мережі)
-    else if (error instanceof Error) {
-      errorMessage = error.message;
-    }
     console.error("Помилка сервісу при створенні заявки: ", error);
+    const errorMessage = handleAxiosError(
+      error,
+      "Сталася помилка при створенні заявки.",
+    );
+
     throw new Error(errorMessage);
   }
 };

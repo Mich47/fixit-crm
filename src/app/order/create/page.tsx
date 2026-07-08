@@ -2,10 +2,7 @@
 
 import { createOrder } from "@/app/services/orderService";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
-import axios from "axios";
 import { useState } from "react";
-
-// axios.defaults.baseURL = process.env.DATABASE_URL || "http://localhost:3000";
 
 export default function CreateOrderPage() {
   const [firstName, setFirstName] = useState("");
@@ -23,14 +20,14 @@ export default function CreateOrderPage() {
     setMessage("");
 
     try {
-      const response = await createOrder({
+      const data = await createOrder({
         clientName: `${firstName} ${lastName}`,
         clientPhone,
         deviceModel,
         description,
       });
 
-      console.log("Відповідь сервера:", response.data);
+      console.log("Відповідь сервера:", data);
 
       // Якщо все успішно — очищуємо форму
       setMessage("✅ Заявку успішно створено в базі даних!");
@@ -40,19 +37,10 @@ export default function CreateOrderPage() {
       setDeviceModel("");
       setDescription("");
     } catch (error) {
-      let errorMessage = "Сталася помилка при створенні заявки.";
-      // 1. Перевіряємо, чи помилка прийшла саме від Axios
-      if (axios.isAxiosError(error)) {
-        // За допомогою безпечного приведення типів (as) дістаємо текст помилки з нашого сервера
-        const serverData = error.response?.data as { error?: string };
-        errorMessage = serverData?.error || error.message;
-      }
-      // 2. Якщо це звичайна помилка JavaScript (наприклад, збій мережі)
-      else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+      const message =
+        error instanceof Error ? error.message : "Сталася невідома помилка.";
 
-      setMessage(`❌ Помилка: ${errorMessage}`);
+      setMessage(`❌ Помилка: ${message}`);
     } finally {
       setLoading(false);
     }
