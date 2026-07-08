@@ -1,77 +1,239 @@
 "use client";
+
+import type { Order } from "@/generated/prisma/client";
 import { useRouter } from "next/navigation";
-import { Order } from "../../generated/prisma/client";
+import { useState } from "react";
 import { updateOrderStatus } from "../services/orderService";
 
 interface OrderTableProps {
   orders: Order[];
 }
 
+const statusLabels: Record<string, string> = {
+  PENDING: "Очікує",
+  IN_PROGRESS: "В роботі",
+  READY: "Готово",
+  ARCHIVED: "Архів",
+};
+
+const statusStyles: Record<string, string> = {
+  PENDING: "border-amber-400/30 bg-amber-400/10 text-amber-200",
+  IN_PROGRESS: "border-sky-400/30 bg-sky-400/10 text-sky-200",
+  READY: "border-emerald-400/30 bg-emerald-400/10 text-emerald-200",
+  ARCHIVED: "border-slate-500/40 bg-slate-700/40 text-slate-300",
+};
+
+const timeFormatter = new Intl.DateTimeFormat("uk-UA", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+const dateFormatter = new Intl.DateTimeFormat("uk-UA", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+function formatOrderDate(value: Date) {
+  const date = new Date(value);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  if (date.toDateString() === today.toDateString()) {
+    return `сьогодні ${timeFormatter.format(date)}`;
+  }
+
+  if (date.toDateString() === yesterday.toDateString()) {
+    return `вчора ${timeFormatter.format(date)}`;
+  }
+
+  return dateFormatter.format(date);
+}
+
+function StatusBadge({ status }: { status: string }) {
+  return (
+    <span
+      className={`inline-flex min-w-24 justify-center rounded-full border px-2.5 py-1 text-xs font-semibold ${
+        statusStyles[status] ?? statusStyles.PENDING
+      }`}
+    >
+      {statusLabels[status] ?? status}
+    </span>
+  );
+}
+
 export default function OrderTable({ orders }: OrderTableProps) {
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSelectChange = async (id: string, newStatus: string) => {
+    setErrorMessage("");
+
     try {
       await updateOrderStatus(id, newStatus);
-
-      router.refresh(); // Оновлюємо серверні дані на сторінці без перезавантаження сайту!
+      router.refresh();
     } catch (error) {
-      console.error("Не вдалося оновити статус: ", error);
-      alert("Помилка при оновлені статусу");
+      console.error("Не вдалося оновити статус:", error);
+      setErrorMessage("Не вдалося оновити статус заявки. Спробуйте ще раз.");
     }
   };
 
+  const renderStatusSelect = (id: string, status: string) => (
+    <select
+      value={status}
+      aria-label="Змінити статус заявки"
+      onClick={(event) => event.stopPropagation()}
+      onKeyDown={(event) => event.stopPropagation()}
+      onChange={(event) => handleSelectChange(id, event.target.value)}
+      className="min-h-11 rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition focus:ring-2 focus:ring-indigo-500 lg:min-h-0 lg:px-2 lg:py-1 lg:text-xs"
+    >
+      <option value="PENDING">Очікує</option>
+      <option value="IN_PROGRESS">В роботі</option>
+      <option value="READY">Готово</option>
+      <option value="ARCHIVED">Архів</option>
+    </select>
+  );
+
   return (
-    <div className="overflow-x-auto rounded-lg border border-white/10 bg-white/5">
-      <table className="min-w-full divide-y divide-white/10 text-left text-sm text-gray-300">
-        <thead className="bg-white/5 text-xs font-semibold uppercase text-gray-400 tracking-wider">
-          <tr>
-            <th className="px-6 py-4">Пристрій</th>
-            <th className="px-6 py-4">Клієнт</th>
-            <th className="px-6 py-4">Телефон</th>
-            <th className="px-6 py-4">Опис поломки</th>
-            <th className="px-6 py-4">Статус</th>
-            <th className="px-6 py-4">Дата</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white/5">
-          {orders.map(
-            ({
-              id,
-              clientName,
-              clientPhone,
-              deviceModel,
-              description,
-              status,
-              createdAt,
-            }) => (
-              <tr key={id} className="hover:bg-white/5 transition">
-                <td className="px-6 py-4 font-semibold text-white">
-                  {deviceModel}
-                </td>
-                <td className="px-6 py-4">{clientName}</td>
-                <td className="px-6 py-4 text-gray-400">{clientPhone}</td>
-                <td className="px-6 py-4 max-w-xs truncate">{description}</td>
-                <td className="px-6 py-4">
-                  <select
-                    value={status}
-                    onChange={(e) => handleSelectChange(id, e.target.value)}
-                    className="bg-gray-800 text-white border border-gray-700 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-                  >
-                    <option value="PENDING">Очікує</option>
-                    <option value="IN_PROGRESS">В роботі</option>
-                    <option value="READY">Готово</option>
-                    <option value="ARCHIVED">Архів</option>
-                  </select>
-                </td>
-                <td className="px-6 py-4 text-gray-400 text-xs">
-                  {new Date(createdAt).toLocaleDateString("uk-UA")}
-                </td>
-              </tr>
-            ),
-          )}
-        </tbody>
-      </table>
+    <div className="space-y-3">
+      {errorMessage && (
+        <p className="rounded-md border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {errorMessage}
+        </p>
+      )}
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
+        {orders.map(
+          ({
+            id,
+            clientName,
+            clientPhone,
+            deviceModel,
+            description,
+            status,
+            createdAt,
+          }) => (
+            <article
+              key={id}
+              role="link"
+              tabIndex={0}
+              onClick={() => router.push(`/order/${id}`)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  router.push(`/order/${id}`);
+                }
+              }}
+              className="cursor-pointer rounded-lg border border-slate-800 bg-slate-900/80 p-4 transition active:scale-[0.99] active:bg-slate-800/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="truncate text-base font-semibold text-white">
+                    {deviceModel}
+                  </h2>
+                  <p className="mt-1 truncate text-sm text-slate-400">
+                    {clientName}
+                  </p>
+                </div>
+                <StatusBadge status={status} />
+              </div>
+
+              <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-300">
+                {description}
+              </p>
+
+              <div className="mt-4 flex items-center justify-between gap-3 text-xs text-slate-400">
+                <span>{formatOrderDate(createdAt)}</span>
+                <span>#{id.slice(0, 8)}</span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-2">
+                <a
+                  href={`tel:${clientPhone}`}
+                  onClick={(event) => event.stopPropagation()}
+                  className="inline-flex min-h-11 items-center justify-center rounded-md border border-sky-400/30 bg-sky-400/10 px-3 text-sm font-semibold text-sky-200 transition active:bg-sky-400/20"
+                >
+                  {clientPhone}
+                </a>
+                {renderStatusSelect(id, status)}
+              </div>
+            </article>
+          ),
+        )}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-lg border border-slate-800 bg-slate-900/70 lg:block">
+        <table className="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
+          <thead className="bg-slate-900 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <tr>
+              <th className="px-5 py-3">Пристрій</th>
+              <th className="px-5 py-3">Клієнт</th>
+              <th className="px-5 py-3">Телефон</th>
+              <th className="px-5 py-3">Опис поломки</th>
+              <th className="px-5 py-3">Статус</th>
+              <th className="px-5 py-3">Дата</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800">
+            {orders.map(
+              ({
+                id,
+                clientName,
+                clientPhone,
+                deviceModel,
+                description,
+                status,
+                createdAt,
+              }) => (
+                <tr
+                  key={id}
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => router.push(`/order/${id}`)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      router.push(`/order/${id}`);
+                    }
+                  }}
+                  className="cursor-pointer transition hover:bg-slate-800/70 focus-visible:bg-slate-800/70 focus-visible:outline-none"
+                >
+                  <td className="px-5 py-4 font-semibold text-white">
+                    {deviceModel}
+                  </td>
+                  <td className="px-5 py-4">{clientName}</td>
+                  <td className="px-5 py-4">
+                    <a
+                      href={`tel:${clientPhone}`}
+                      onClick={(event) => event.stopPropagation()}
+                      className="font-medium text-sky-300 transition hover:text-sky-200"
+                    >
+                      {clientPhone}
+                    </a>
+                  </td>
+                  <td className="max-w-xs truncate px-5 py-4 text-slate-400">
+                    {description}
+                  </td>
+                  <td className="px-5 py-4">
+                    <div
+                      className="flex items-center gap-2"
+                      onClick={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => event.stopPropagation()}
+                    >
+                      <StatusBadge status={status} />
+                      {renderStatusSelect(id, status)}
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-4 text-xs text-slate-400">
+                    {formatOrderDate(createdAt)}
+                  </td>
+                </tr>
+              ),
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

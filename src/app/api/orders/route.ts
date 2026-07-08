@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
     if (!clientName || !clientPhone || !deviceModel || !description) {
       return NextResponse.json(
-        { error: "Усі поля є обов'язковими для заповнення!" },
+        { error: "Усі поля обов'язкові для заповнення." },
         { status: 400 },
       );
     }
@@ -19,15 +19,15 @@ export async function POST(request: Request) {
         clientPhone,
         deviceModel,
         description,
-        status: "PENDING", // Статус за замовчуванням
+        status: "PENDING",
       },
     });
 
     return NextResponse.json(newOrder, { status: 201 });
   } catch (error) {
-    console.log("Помилка на бекенді: ", error);
+    console.error("Помилка на бекенді при створенні заявки:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Внутрішня помилка сервера" },
       { status: 500 },
     );
   }
