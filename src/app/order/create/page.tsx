@@ -49,10 +49,10 @@ export default function CreateOrderPage() {
   return (
     <>
       <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl">
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
           Заявка на ремонт
         </h2>
-        <p className="mt-2 text-lg/8 text-gray-400">
+        <p className="mt-2 text-base text-gray-400">
           Створіть заявку на ремонт заповнивши усі поля форми.
         </p>
       </div>
