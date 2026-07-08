@@ -10,31 +10,34 @@ export default async function DashBoardPage() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="sm:flex sm:items-center justify-between mb-8">
+    <div className="mx-auto max-w-7xl">
+      <div className="mb-5 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">
-            Панель майстра
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            Панель заявок
           </h1>
-          <p className="mt-2 text-sm text-gray-400">
-            Список усіх активних та завершених заявок на ремонт у системі.
+          <p className="mt-2 max-w-2xl text-sm text-slate-400">
+            Всі активні та завершені заявки на ремонт в одному робочому списку.
           </p>
         </div>
         <Link
           href="/order/create"
-          className="rounded-md bg-indigo-500 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 sm:w-auto"
         >
           + Нова заявка
         </Link>
       </div>
 
-      {/* Якщо в базі немає замовлень */}
       {orders.length === 0 ? (
-        <p className="text-gray-400 text-center py-10 bg-white/5 rounded-lg border border-white/10">
-          Заявок поки немає. Створіть першу заявку через форму!
-        </p>
+        <div className="rounded-lg border border-slate-800 bg-slate-900/70 px-4 py-10 text-center sm:px-6 sm:py-12">
+          <h2 className="text-base font-semibold text-white">
+            Заявок поки немає
+          </h2>
+          <p className="mt-2 text-sm text-slate-400">
+            Створіть першу заявку, щоб почати вести ремонт у CRM.
+          </p>
+        </div>
       ) : (
-        /* Таблиця замовлень на Tailwind */
         <OrderTable orders={orders} />
       )}
     </div>
