@@ -5,8 +5,6 @@ import { updateOrderStatus } from "../services/orderService";
 
 interface OrderTableProps {
   orders: Order[];
-  // Описуємо тип функції: приймає два рядки, повертає Promise (бо вона асинхронна)
-  onStatusChange: (id: string, status: string) => Promise<void>;
 }
 
 export default function OrderTable({ orders }: OrderTableProps) {
