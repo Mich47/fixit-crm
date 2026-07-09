@@ -1,6 +1,7 @@
 "use client";
 
 import type { Order } from "@/generated/prisma/client";
+import { ORDER_STATUS_META, ORDER_STATUS_VALUES } from "@/app/orders/status";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { updateOrderStatus } from "../services/orderService";
@@ -9,42 +10,7 @@ interface OrderTableProps {
   orders: Order[];
 }
 
-// 🌟 Єдиний конфіг для назв та соковитих кольорів статусів
-const STATUS_CONFIG: Record<
-  string,
-  {
-    label: string;
-    badgeClasses: string;
-    selectClasses: string;
-    optionClasses: string;
-  }
-> = {
-  PENDING: {
-    label: "Очікує",
-    badgeClasses: "border-amber-400/30 bg-amber-400/40 text-amber-200 ",
-    selectClasses: "text-amber-400 border-amber-500/30 focus:ring-amber-500",
-    optionClasses: "text-amber-400 bg-slate-900 font-semibold",
-  },
-  IN_PROGRESS: {
-    label: "В роботі",
-    badgeClasses: "border-sky-400/30 bg-sky-400/40 text-sky-200",
-    selectClasses: "text-sky-400 border-sky-500/30 focus:ring-sky-500",
-    optionClasses: "text-sky-400 bg-slate-900 font-semibold",
-  },
-  READY: {
-    label: "Готово",
-    badgeClasses: "border-emerald-400/30 bg-emerald-400/40 text-emerald-200 ",
-    selectClasses:
-      "text-emerald-400 border-emerald-500/30 focus:ring-emerald-500",
-    optionClasses: "text-emerald-400 bg-slate-900 font-semibold",
-  },
-  ARCHIVED: {
-    label: "Архів",
-    badgeClasses: "border-slate-500/40 bg-slate-700/60 text-slate-300",
-    selectClasses: "text-gray-400 border-white/10 focus:ring-gray-500",
-    optionClasses: "text-gray-400 bg-slate-900 font-normal",
-  },
-};
+const STATUS_CONFIG = ORDER_STATUS_META;
 
 // Розумне форматування дат (сьогодні/вчора/повна дата)
 const timeFormatter = new Intl.DateTimeFormat("uk-UA", {
@@ -77,7 +43,7 @@ function formatOrderDate(value: Date) {
 
 // Окремий компонент красивої кольорової плашки
 function StatusBadge({ status }: { status: string }) {
-  const config = STATUS_CONFIG[status] || STATUS_CONFIG.PENDING;
+  const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.PENDING;
   return (
     <span
       className={`inline-flex min-w-24 justify-center rounded-full border px-2.5 py-1 text-xs font-semibold ${config.badgeClasses}`}
@@ -108,7 +74,7 @@ export default function OrderTable({ orders }: OrderTableProps) {
     status: string,
     isMobile: boolean,
   ) => {
-    const config = STATUS_CONFIG[status] || STATUS_CONFIG.PENDING;
+    const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.PENDING;
     const textColorClass = config.selectClasses.split(" ")[0];
     const backgroundColorClass = config.badgeClasses.split(" ")[1];
 
@@ -126,7 +92,7 @@ export default function OrderTable({ orders }: OrderTableProps) {
               : "py-1 pl-2 pr-9 text-xs font-semibold lg:py-1 lg:text-xs"
           }`}
         >
-          {Object.keys(STATUS_CONFIG).map((key) => (
+          {ORDER_STATUS_VALUES.map((key) => (
             <option
               key={key}
               value={key}

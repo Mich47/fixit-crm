@@ -25,12 +25,12 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="uk"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col bg-gray-900 text-gray-100">
         <Header />
-        <main className="isolate bg-gray-900 px-6 py-24 sm:py-32 lg:px-8 flex-1">
+        <main className="isolate flex-1 bg-gray-900 px-6 py-10 sm:py-16 lg:px-8">
           <div
             aria-hidden="true"
             className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"

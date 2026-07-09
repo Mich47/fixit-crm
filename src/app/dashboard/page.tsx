@@ -10,18 +10,49 @@ interface DashboardProps {
   searchParams: Promise<{
     search?: string;
     status?: string;
+    page?: string;
   }>;
 }
 
 export default async function DashBoardPage({ searchParams }: DashboardProps) {
-  const { search, status } = await searchParams;
+  const { search, status, page } = await searchParams;
+  const currentPage = Number.parseInt(page ?? "1", 10) || 1;
 
-  const [statsData, orders] = await Promise.all([
+  const [statsData, filteredOrdersResult] = await Promise.all([
     getDashboardStats(),
-    getFilteredOrders(search, status),
+    getFilteredOrders(search, status, currentPage, 10),
   ]);
 
-  const { totalCount, pendingCount, inProgressCount, readyCount } = statsData;
+  const {
+    totalCount,
+    pendingCount,
+    inProgressCount,
+    readyCount,
+    archivedCount,
+  } = statsData;
+
+  const {
+    orders,
+    totalCount: totalFilteredCount,
+    page: resolvedPage,
+    hasMore,
+  } = filteredOrdersResult;
+  const totalPages = Math.max(1, Math.ceil(totalFilteredCount / 10));
+
+  const buildPageHref = (nextPage: number) => {
+    const params = new URLSearchParams();
+
+    if (search) {
+      params.set("search", search);
+    }
+
+    if (status) {
+      params.set("status", status);
+    }
+
+    params.set("page", String(nextPage));
+    return `/dashboard?${params.toString()}`;
+  };
 
   const stats = [
     {
@@ -40,9 +71,14 @@ export default async function DashBoardPage({ searchParams }: DashboardProps) {
       color: "text-sky-400 border-sky-500/20",
     },
     {
-      name: "Готові 🎉",
+      name: "Готові",
       value: readyCount,
       color: "text-emerald-400 border-emerald-500/20",
+    },
+    {
+      name: "Архів",
+      value: archivedCount,
+      color: "text-slate-400 border-slate-500/20",
     },
   ];
 
@@ -68,7 +104,7 @@ export default async function DashBoardPage({ searchParams }: DashboardProps) {
       </div>
 
       {/* Картки KPI аналітики */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-8">
+      <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-5">
         {stats.map((stat) => (
           <div
             key={stat.name}
@@ -91,7 +127,30 @@ export default async function DashBoardPage({ searchParams }: DashboardProps) {
           Нічого не знайдено за такими критеріями пошуку.
         </p>
       ) : (
-        <OrderTable orders={orders} />
+        <>
+          <OrderTable orders={orders} />
+          {totalPages > 1 && (
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-gray-300">
+              <p>
+                Сторінка {resolvedPage} з {totalPages} · показано {orders.length} із {totalFilteredCount}
+              </p>
+              <div className="flex gap-2">
+                <Link
+                  href={buildPageHref(Math.max(1, resolvedPage - 1))}
+                  className={`rounded-md border border-white/10 px-3 py-2 transition ${resolvedPage === 1 ? "pointer-events-none opacity-40" : "hover:bg-white/10"}`}
+                >
+                  ← Назад
+                </Link>
+                <Link
+                  href={buildPageHref(Math.min(totalPages, resolvedPage + 1))}
+                  className={`rounded-md border border-white/10 px-3 py-2 transition ${!hasMore ? "pointer-events-none opacity-40" : "hover:bg-white/10"}`}
+                >
+                  Далі →
+                </Link>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

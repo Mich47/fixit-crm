@@ -21,8 +21,8 @@ export default function HomePage() {
         Перевірка статусу ремонту
       </h1>
       <p className="mt-4 text-lg text-gray-400">
-        Введіть номер вашої квитанції (ID заявки), щоб дізнатися поточний стан
-        вашого пристрою в реальному часі.
+        Введіть номер вашої квитанції або короткий код заявки, щоб дізнатися
+        поточний стан вашого пристрою в реальному часі.
       </p>
 
       <form
@@ -32,7 +32,7 @@ export default function HomePage() {
         <input
           type="text"
           required
-          placeholder="напр. e3b0c442-..."
+          placeholder="напр. A1B2C3D4"
           value={orderId}
           onChange={(e) => setOrderId(e.target.value)}
           className="block w-full rounded-lg bg-white/5 border border-white/10 px-4 py-3 text-base text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"

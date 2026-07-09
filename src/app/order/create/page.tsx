@@ -11,42 +11,101 @@ export default function CreateOrderPage() {
   const [clientPhone, setClientPhone] = useState("");
   const [deviceModel, setDeviceModel] = useState("");
   const [description, setDescription] = useState("");
+  const [serialNumber, setSerialNumber] = useState("");
+  const [deviceType, setDeviceType] = useState("");
+  const [priority, setPriority] = useState("NORMAL");
+  const [estimatedPrice, setEstimatedPrice] = useState("");
+  const [finalPrice, setFinalPrice] = useState("");
+  const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const router = useRouter();
+
+  const normalizePhone = (phone: string) => phone.replace(/\D/g, "");
+
+  const validateForm = () => {
+    if (!firstName.trim() || !lastName.trim()) {
+      return "Ім'я та прізвище обов'язкові.";
+    }
+
+    if (!clientPhone.trim()) {
+      return "Номер телефону обов'язковий.";
+    }
+
+    const digits = normalizePhone(clientPhone);
+    if (digits.length < 9) {
+      return "Введіть коректний номер телефону.";
+    }
+
+    if (!deviceModel.trim()) {
+      return "Модель пристрою обов'язкова.";
+    }
+
+    if (!description.trim()) {
+      return "Опис поломки обов'язковий.";
+    }
+
+    if (estimatedPrice && Number.isNaN(Number(estimatedPrice))) {
+      return "Орієнтовна вартість має бути числом.";
+    }
+
+    if (finalPrice && Number.isNaN(Number(finalPrice))) {
+      return "Фінальна вартість має бути числом.";
+    }
+
+    return "";
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
 
+    const validationError = validateForm();
+    if (validationError) {
+      setMessage(`❌ ${validationError}`);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const data = await createOrder({
+      const normalizedPhone = normalizePhone(clientPhone);
+
+      await createOrder({
         clientName: `${firstName} ${lastName}`,
-        clientPhone,
+        clientPhone: normalizedPhone,
         deviceModel,
         description,
+        serialNumber: serialNumber.trim() || undefined,
+        deviceType: deviceType.trim() || undefined,
+        priority,
+        estimatedPrice: estimatedPrice ? Number(estimatedPrice) : undefined,
+        finalPrice: finalPrice ? Number(finalPrice) : undefined,
+        notes: notes.trim() || undefined,
       });
 
-      console.log("Відповідь сервера:", data);
-
-      // Якщо все успішно — очищуємо форму
-      setMessage("✅ Заявку успішно створено в базі даних!");
+      // Якщо все успішно — очищуємо форму і переходимо в адмінку
       setFirstName("");
       setLastName("");
       setClientPhone("");
       setDeviceModel("");
       setDescription("");
+      setSerialNumber("");
+      setDeviceType("");
+      setPriority("NORMAL");
+      setEstimatedPrice("");
+      setFinalPrice("");
+      setNotes("");
+      setMessage("✅ Заявку успішно створено в базі даних!");
+      router.push("/dashboard");
     } catch (error) {
-      const message =
+      const errorMessage =
         error instanceof Error ? error.message : "Сталася невідома помилка.";
 
-      setMessage(`❌ Помилка: ${message}`);
+      setMessage(`❌ Помилка: ${errorMessage}`);
     } finally {
       setLoading(false);
-      // Після успішного створення відправляємо майстра в адмінку
-      router.push("/dashboard");
     }
   };
 
@@ -72,7 +131,7 @@ export default function CreateOrderPage() {
               htmlFor="first-name"
               className="block text-sm/6 font-semibold text-white"
             >
-              Ім&apos;я
+              Ім&apos;я <span className="text-rose-400">*</span>
             </label>
             <div className="mt-2.5">
               <input
@@ -91,7 +150,7 @@ export default function CreateOrderPage() {
               htmlFor="last-name"
               className="block text-sm/6 font-semibold text-white"
             >
-              Прізвище
+              Прізвище <span className="text-rose-400">*</span>
             </label>
             <div className="mt-2.5">
               <input
@@ -111,7 +170,7 @@ export default function CreateOrderPage() {
               htmlFor="phone-number"
               className="block text-sm/6 font-semibold text-white"
             >
-              Номер телефону
+              Номер телефону <span className="text-rose-400">*</span>
             </label>
             <div className="mt-2.5">
               <div className="flex rounded-md bg-white/5 outline-1 -outline-offset-1 outline-white/10 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-500">
@@ -149,7 +208,7 @@ export default function CreateOrderPage() {
               htmlFor="deviceModel"
               className="block text-sm/6 font-semibold text-white"
             >
-              Модель пристрою
+              Модель пристрою <span className="text-rose-400">*</span>
             </label>
             <div className="mt-2.5">
               <input
@@ -168,7 +227,7 @@ export default function CreateOrderPage() {
               htmlFor="description"
               className="block text-sm/6 font-semibold text-white"
             >
-              Опис поломки
+              Опис поломки <span className="text-rose-400">*</span>
             </label>
             <div className="mt-2.5">
               <textarea
@@ -178,6 +237,110 @@ export default function CreateOrderPage() {
                 className="block w-full rounded-md bg-white/5 px-3.5 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="serial-number" className="block text-sm/6 font-semibold text-white">
+              Серійний номер
+            </label>
+            <div className="mt-2.5">
+              <input
+                id="serial-number"
+                name="serial-number"
+                type="text"
+                className="block w-full rounded-md bg-white/5 px-3.5 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
+                value={serialNumber}
+                onChange={(e) => setSerialNumber(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="device-type" className="block text-sm/6 font-semibold text-white">
+              Тип пристрою
+            </label>
+            <div className="mt-2.5">
+              <input
+                id="device-type"
+                name="device-type"
+                type="text"
+                placeholder="Телефон, ноутбук, планшет"
+                className="block w-full rounded-md bg-white/5 px-3.5 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
+                value={deviceType}
+                onChange={(e) => setDeviceType(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="priority" className="block text-sm/6 font-semibold text-white">
+              Пріоритет
+            </label>
+            <div className="mt-2.5">
+              <select
+                id="priority"
+                name="priority"
+                className="block w-full rounded-md bg-white/5 px-3.5 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+              >
+                <option value="LOW">Низький</option>
+                <option value="NORMAL">Звичайний</option>
+                <option value="HIGH">Високий</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="estimated-price" className="block text-sm/6 font-semibold text-white">
+              Орієнтовна вартість
+            </label>
+            <div className="mt-2.5">
+              <input
+                id="estimated-price"
+                name="estimated-price"
+                type="number"
+                min="0"
+                step="0.01"
+                className="block w-full rounded-md bg-white/5 px-3.5 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
+                value={estimatedPrice}
+                onChange={(e) => setEstimatedPrice(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="final-price" className="block text-sm/6 font-semibold text-white">
+              Фінальна вартість
+            </label>
+            <div className="mt-2.5">
+              <input
+                id="final-price"
+                name="final-price"
+                type="number"
+                min="0"
+                step="0.01"
+                className="block w-full rounded-md bg-white/5 px-3.5 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
+                value={finalPrice}
+                onChange={(e) => setFinalPrice(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="sm:col-span-2">
+            <label htmlFor="notes" className="block text-sm/6 font-semibold text-white">
+              Примітки
+            </label>
+            <div className="mt-2.5">
+              <textarea
+                id="notes"
+                name="notes"
+                rows={3}
+                className="block w-full rounded-md bg-white/5 px-3.5 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
               />
             </div>
           </div>

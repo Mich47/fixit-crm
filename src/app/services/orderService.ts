@@ -1,7 +1,18 @@
 import type { Order } from "@/generated/prisma/client";
 import axios from "axios";
 
-export type CreateOrderDto = Omit<Order, "id" | "status" | "createdAt">;
+export interface CreateOrderInput {
+  clientName: string;
+  clientPhone: string;
+  deviceModel: string;
+  description: string;
+  serialNumber?: string;
+  deviceType?: string;
+  priority?: string;
+  estimatedPrice?: number | string | null;
+  finalPrice?: number | string | null;
+  notes?: string;
+}
 
 const handleAxiosError = (error: unknown, defaultMessage: string): string => {
   if (axios.isAxiosError(error)) {
@@ -23,7 +34,6 @@ export const updateOrderStatus = async (
   try {
     await axios.patch(`/api/orders/${orderId}`, { status: newStatus });
   } catch (error) {
-    console.error("Помилка сервісу при оновленні статусу:", error);
     const errorMessage = handleAxiosError(
       error,
       "Сталася помилка при оновленні статусу.",
@@ -33,23 +43,14 @@ export const updateOrderStatus = async (
   }
 };
 
-export const createOrder = async ({
-  clientName,
-  clientPhone,
-  deviceModel,
-  description,
-}: CreateOrderDto): Promise<Order> => {
+export const createOrder = async (
+  payload: CreateOrderInput,
+): Promise<Order> => {
   try {
-    const response = await axios.post("/api/orders", {
-      clientName,
-      clientPhone,
-      deviceModel,
-      description,
-    });
+    const response = await axios.post("/api/orders", payload);
 
     return response.data;
   } catch (error) {
-    console.error("Помилка сервісу при створенні заявки:", error);
     const errorMessage = handleAxiosError(
       error,
       "Сталася помилка при створенні заявки.",
