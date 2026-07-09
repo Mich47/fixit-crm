@@ -39,6 +39,12 @@ export default function Header() {
         {/* Десктопна навігація (Ховаємо зайве, ставимо реальні пункти) */}
         <PopoverGroup className="hidden lg:flex lg:gap-x-12">
           <Link
+            href="/"
+            className="text-sm/6 font-semibold text-white hover:text-indigo-400 transition"
+          >
+            Головна
+          </Link>
+          <Link
             href="/dashboard"
             className="text-sm/6 font-semibold text-white hover:text-indigo-400 transition"
           >
@@ -90,6 +96,13 @@ export default function Header() {
             <div className="-my-6 divide-y divide-white/10">
               {/* Мобільні посилання */}
               <div className="space-y-2 py-6">
+                <Link
+                  href="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-white hover:bg-white/5"
+                >
+                  Головна
+                </Link>
                 <Link
                   href="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
