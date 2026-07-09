@@ -1,42 +1,90 @@
-import { prisma } from "@/lib/db";
 import Link from "next/link";
 import OrderTable from "./OrderTable";
+import DashboardFilters from "./DashboardFilters";
+import { getKPI, searchOrderByFilter } from "../services/orderServerService";
 
-export default async function DashBoardPage() {
-  const orders = await prisma.order.findMany({
-    orderBy: {
-      createdAt: "desc",
+interface DashboardProps {
+  searchParams: Promise<{
+    search?: string;
+    status?: string;
+  }>;
+}
+
+export default async function DashBoardPage({ searchParams }: DashboardProps) {
+  const { search, status } = await searchParams;
+
+  const orders = await searchOrderByFilter(search, status);
+
+  const { totalCount, pendingCount, inProgressCount, readyCount } =
+    await getKPI();
+
+  const stats = [
+    {
+      name: "Всього заявок",
+      value: totalCount,
+      color: "text-indigo-400 border-indigo-500/20",
     },
-  });
+    {
+      name: "Очікують",
+      value: pendingCount,
+      color: "text-amber-400 border-amber-500/20",
+    },
+    {
+      name: "В роботі",
+      value: inProgressCount,
+      color: "text-sky-400 border-sky-500/20",
+    },
+    {
+      name: "Готові 🎉",
+      value: readyCount,
+      color: "text-emerald-400 border-emerald-500/20",
+    },
+  ];
 
   return (
-    <div className="mx-auto max-w-7xl">
-      <div className="mb-5 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
+    <div className="max-w-6xl mx-auto">
+      {/* Шапка адмінки */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            Панель заявок
+          <h1 className="text-3xl font-bold tracking-tight text-white">
+            Панель майстра
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-400">
-            Всі активні та завершені заявки на ремонт в одному робочому списку.
+          <p className="mt-2 text-sm text-gray-400">
+            Керування ремонтами, оновлення статусів та аналітика черги в
+            реальному часі.
           </p>
         </div>
         <Link
           href="/order/create"
-          className="inline-flex min-h-11 w-full items-center justify-center rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 sm:w-auto"
+          className="block sm:inline-block text-center rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 transition"
         >
-          + Нова заявка
+          + Nova заявка
         </Link>
       </div>
 
+      {/* Картки KPI аналітики */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-8">
+        {stats.map((stat) => (
+          <div
+            key={stat.name}
+            className={`rounded-xl border bg-white/5 p-4 shadow-sm ${stat.color}`}
+          >
+            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+              {stat.name}
+            </p>
+            <p className="mt-2 text-3xl font-semibold">{stat.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* 🌟 НАШІ НОВІ ФІЛЬТРИ */}
+      <DashboardFilters />
+
+      {/* Таблиця або Картки замовлень */}
       {orders.length === 0 ? (
-        <div className="rounded-lg border border-slate-800 bg-slate-900/70 px-4 py-10 text-center sm:px-6 sm:py-12">
-          <h2 className="text-base font-semibold text-white">
-            Заявок поки немає
-          </h2>
-          <p className="mt-2 text-sm text-slate-400">
-            Створіть першу заявку, щоб почати вести ремонт у CRM.
-          </p>
-        </div>
+        <p className="text-gray-400 text-center py-10 bg-white/5 rounded-lg border border-white/10">
+          Нічого не знайдено за такими критеріями пошуку.
+        </p>
       ) : (
         <OrderTable orders={orders} />
       )}
