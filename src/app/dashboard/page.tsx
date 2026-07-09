@@ -1,7 +1,10 @@
 import Link from "next/link";
 import OrderTable from "./OrderTable";
 import DashboardFilters from "./DashboardFilters";
-import { getKPI, searchOrderByFilter } from "../services/orderServerService";
+import {
+  getDashboardStats,
+  getFilteredOrders,
+} from "../services/orderServerService";
 
 interface DashboardProps {
   searchParams: Promise<{
@@ -13,10 +16,12 @@ interface DashboardProps {
 export default async function DashBoardPage({ searchParams }: DashboardProps) {
   const { search, status } = await searchParams;
 
-  const orders = await searchOrderByFilter(search, status);
+  const [statsData, orders] = await Promise.all([
+    getDashboardStats(),
+    getFilteredOrders(search, status),
+  ]);
 
-  const { totalCount, pendingCount, inProgressCount, readyCount } =
-    await getKPI();
+  const { totalCount, pendingCount, inProgressCount, readyCount } = statsData;
 
   const stats = [
     {

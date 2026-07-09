@@ -12,7 +12,7 @@ export async function getOrderById(id: string): Promise<Order | null> {
   }
 }
 
-export async function searchOrderByFilter(
+export async function getFilteredOrders(
   search?: string,
   status?: string,
 ): Promise<Order[] | null> {
@@ -44,7 +44,7 @@ export async function searchOrderByFilter(
   }
 }
 
-export async function getKPI(): Promise<{
+export async function getDashboardStats(): Promise<{
   totalCount: number;
   pendingCount: number;
   inProgressCount: number;
