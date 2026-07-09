@@ -1,6 +1,8 @@
 import type { Order } from "@/generated/prisma/client";
 import axios from "axios";
 
+export type CreateOrderDto = Omit<Order, "id" | "status" | "createdAt">;
+
 const handleAxiosError = (error: unknown, defaultMessage: string): string => {
   if (axios.isAxiosError(error)) {
     const serverData = error.response?.data as { error?: string };
@@ -36,7 +38,7 @@ export const createOrder = async ({
   clientPhone,
   deviceModel,
   description,
-}: Omit<Order, "id" | "status" | "createdAt">): Promise<Order> => {
+}: CreateOrderDto): Promise<Order> => {
   try {
     const response = await axios.post("/api/orders", {
       clientName,

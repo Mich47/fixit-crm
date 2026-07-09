@@ -15,7 +15,7 @@ export async function getOrderById(id: string): Promise<Order | null> {
 export async function getFilteredOrders(
   search?: string,
   status?: string,
-): Promise<Order[] | null> {
+): Promise<Order[]> {
   const whereCondition: Record<string, unknown> = {};
 
   if (status && status !== "ALL") {

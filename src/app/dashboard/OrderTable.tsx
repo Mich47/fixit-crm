@@ -109,9 +109,9 @@ export default function OrderTable({ orders }: OrderTableProps) {
     isMobile: boolean,
   ) => {
     const config = STATUS_CONFIG[status] || STATUS_CONFIG.PENDING;
-    const textColorClass   = config.selectClasses.split(" ")[0];
+    const textColorClass = config.selectClasses.split(" ")[0];
     const backgroundColorClass = config.badgeClasses.split(" ")[1];
-    
+
     return (
       <div className={`relative ${isMobile ? "w-full" : "inline-block"}`}>
         <select
