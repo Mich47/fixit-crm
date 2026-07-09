@@ -2,17 +2,19 @@
 
 import { createOrder } from "@/app/services/orderService";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function CreateOrderPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  //const [email, setEmail] = useState("");
   const [clientPhone, setClientPhone] = useState("");
   const [deviceModel, setDeviceModel] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,6 +45,8 @@ export default function CreateOrderPage() {
       setMessage(`❌ Помилка: ${message}`);
     } finally {
       setLoading(false);
+      // Після успішного створення відправляємо майстра в адмінку
+      router.push("/dashboard");
     }
   };
 
