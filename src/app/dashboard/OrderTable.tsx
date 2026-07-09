@@ -43,7 +43,9 @@ function formatOrderDate(value: Date) {
 
 // Окремий компонент красивої кольорової плашки
 function StatusBadge({ status }: { status: string }) {
-  const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.PENDING;
+  const config =
+    STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] ||
+    STATUS_CONFIG.PENDING;
   return (
     <span
       className={`inline-flex min-w-24 justify-center rounded-full border px-2.5 py-1 text-xs font-semibold ${config.badgeClasses}`}
@@ -74,7 +76,9 @@ export default function OrderTable({ orders }: OrderTableProps) {
     status: string,
     isMobile: boolean,
   ) => {
-    const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.PENDING;
+    const config =
+      STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] ||
+      STATUS_CONFIG.PENDING;
     const textColorClass = config.selectClasses.split(" ")[0];
     const backgroundColorClass = config.badgeClasses.split(" ")[1];
 

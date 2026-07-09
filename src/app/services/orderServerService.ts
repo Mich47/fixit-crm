@@ -10,7 +10,9 @@ export interface OrderWithHistory extends Order {
   }>;
 }
 
-export async function getOrderById(id: string): Promise<OrderWithHistory | null> {
+export async function getOrderById(
+  id: string,
+): Promise<OrderWithHistory | null> {
   const normalizedId = id.trim();
 
   try {

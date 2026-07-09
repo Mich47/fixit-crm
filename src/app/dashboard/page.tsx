@@ -132,7 +132,8 @@ export default async function DashBoardPage({ searchParams }: DashboardProps) {
           {totalPages > 1 && (
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-gray-300">
               <p>
-                Сторінка {resolvedPage} з {totalPages} · показано {orders.length} із {totalFilteredCount}
+                Сторінка {resolvedPage} з {totalPages} · показано{" "}
+                {orders.length} із {totalFilteredCount}
               </p>
               <div className="flex gap-2">
                 <Link

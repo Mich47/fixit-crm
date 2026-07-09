@@ -242,7 +242,10 @@ export default function CreateOrderPage() {
           </div>
 
           <div>
-            <label htmlFor="serial-number" className="block text-sm/6 font-semibold text-white">
+            <label
+              htmlFor="serial-number"
+              className="block text-sm/6 font-semibold text-white"
+            >
               Серійний номер
             </label>
             <div className="mt-2.5">
@@ -258,7 +261,10 @@ export default function CreateOrderPage() {
           </div>
 
           <div>
-            <label htmlFor="device-type" className="block text-sm/6 font-semibold text-white">
+            <label
+              htmlFor="device-type"
+              className="block text-sm/6 font-semibold text-white"
+            >
               Тип пристрою
             </label>
             <div className="mt-2.5">
@@ -275,7 +281,10 @@ export default function CreateOrderPage() {
           </div>
 
           <div>
-            <label htmlFor="priority" className="block text-sm/6 font-semibold text-white">
+            <label
+              htmlFor="priority"
+              className="block text-sm/6 font-semibold text-white"
+            >
               Пріоритет
             </label>
             <div className="mt-2.5">
@@ -294,7 +303,10 @@ export default function CreateOrderPage() {
           </div>
 
           <div>
-            <label htmlFor="estimated-price" className="block text-sm/6 font-semibold text-white">
+            <label
+              htmlFor="estimated-price"
+              className="block text-sm/6 font-semibold text-white"
+            >
               Орієнтовна вартість
             </label>
             <div className="mt-2.5">
@@ -312,7 +324,10 @@ export default function CreateOrderPage() {
           </div>
 
           <div>
-            <label htmlFor="final-price" className="block text-sm/6 font-semibold text-white">
+            <label
+              htmlFor="final-price"
+              className="block text-sm/6 font-semibold text-white"
+            >
               Фінальна вартість
             </label>
             <div className="mt-2.5">
@@ -330,7 +345,10 @@ export default function CreateOrderPage() {
           </div>
 
           <div className="sm:col-span-2">
-            <label htmlFor="notes" className="block text-sm/6 font-semibold text-white">
+            <label
+              htmlFor="notes"
+              className="block text-sm/6 font-semibold text-white"
+            >
               Примітки
             </label>
             <div className="mt-2.5">

@@ -102,38 +102,52 @@ export default async function OrderDetailsPage({ params }: PageProps) {
             </p>
           </div>
 
-          {(order.serialNumber || order.deviceType || order.estimatedPrice || order.finalPrice || order.notes) && (
+          {(order.serialNumber ||
+            order.deviceType ||
+            order.estimatedPrice ||
+            order.finalPrice ||
+            order.notes) && (
             <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-5">
               <p className="text-sm font-medium text-gray-400">Додатково</p>
               <dl className="mt-4 grid gap-3 text-sm text-gray-300 sm:grid-cols-2">
                 {order.serialNumber ? (
                   <div>
                     <dt className="text-gray-500">Серійний номер</dt>
-                    <dd className="mt-1 font-medium text-white">{order.serialNumber}</dd>
+                    <dd className="mt-1 font-medium text-white">
+                      {order.serialNumber}
+                    </dd>
                   </div>
                 ) : null}
                 {order.deviceType ? (
                   <div>
                     <dt className="text-gray-500">Тип пристрою</dt>
-                    <dd className="mt-1 font-medium text-white">{order.deviceType}</dd>
+                    <dd className="mt-1 font-medium text-white">
+                      {order.deviceType}
+                    </dd>
                   </div>
                 ) : null}
                 {order.estimatedPrice ? (
                   <div>
                     <dt className="text-gray-500">Орієнтовна вартість</dt>
-                    <dd className="mt-1 font-medium text-white">{Number(order.estimatedPrice).toLocaleString("uk-UA")} ₴</dd>
+                    <dd className="mt-1 font-medium text-white">
+                      {Number(order.estimatedPrice).toLocaleString("uk-UA")} ₴
+                    </dd>
                   </div>
                 ) : null}
                 {order.finalPrice ? (
                   <div>
                     <dt className="text-gray-500">Фінальна вартість</dt>
-                    <dd className="mt-1 font-medium text-white">{Number(order.finalPrice).toLocaleString("uk-UA")} ₴</dd>
+                    <dd className="mt-1 font-medium text-white">
+                      {Number(order.finalPrice).toLocaleString("uk-UA")} ₴
+                    </dd>
                   </div>
                 ) : null}
                 {order.notes ? (
                   <div className="sm:col-span-2">
                     <dt className="text-gray-500">Примітки</dt>
-                    <dd className="mt-1 font-medium text-white">{order.notes}</dd>
+                    <dd className="mt-1 font-medium text-white">
+                      {order.notes}
+                    </dd>
                   </div>
                 ) : null}
               </dl>
@@ -142,7 +156,9 @@ export default async function OrderDetailsPage({ params }: PageProps) {
 
           {order.statusHistory.length > 0 && (
             <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-5">
-              <p className="text-sm font-medium text-gray-400">Історія статусів</p>
+              <p className="text-sm font-medium text-gray-400">
+                Історія статусів
+              </p>
               <ul className="mt-4 space-y-3">
                 {order.statusHistory.map((entry) => (
                   <li
@@ -150,7 +166,9 @@ export default async function OrderDetailsPage({ params }: PageProps) {
                     className="flex flex-col gap-1 rounded-lg border border-white/10 bg-slate-900/50 px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between"
                   >
                     <span className="font-medium text-white">
-                      {ORDER_STATUS_LABELS[entry.status as keyof typeof ORDER_STATUS_LABELS] ?? entry.status}
+                      {ORDER_STATUS_LABELS[
+                        entry.status as keyof typeof ORDER_STATUS_LABELS
+                      ] ?? entry.status}
                     </span>
                     <span className="text-gray-400">
                       {new Date(entry.changedAt).toLocaleString("uk-UA", {
