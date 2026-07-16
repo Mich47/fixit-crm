@@ -12,12 +12,28 @@ datasource db {
   provider = "postgresql"
 }
 
+// Безпечний обмежений список статусів для CRM
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  READY
+  ARCHIVED
+}
+
 model Order {
-  id String @id @default(uuid())
-  clientName String
-  clientPhone String
-  deviceModel String
-  description String
-  status String @default("PENDING") // PENDING, IN_PROGRESS, READY, ARCHIVED
-  createdAt DateTime @default(now())
+  id             String      @id @default(uuid())
+  clientName     String
+  clientPhone    String
+  deviceModel    String
+  description    String
+  status         OrderStatus @default(PENDING) // тепер статус використовує тип OrderStatus
+  
+  // НАШІ НОВІ БІЗНЕС-ПОЛЯ:
+  estimatedPrice Decimal?    @db.Decimal(10, 2) // Орієнтовна ціна (Decimal захищає від округлень копійок)
+  finalPrice     Decimal?    @db.Decimal(10, 2) // Фінальна ціна після ремонту
+  serialNumber   String?                        // Серійний номер або IMEI пристрою (необов'язкове)
+  notes          String?                        // Приховані нотатки для майстра (необов'язкове)
+  
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @default(now()) @updatedAt // Автоматично оновлюється при кожній зміні замовлення
 }
