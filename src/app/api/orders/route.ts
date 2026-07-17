@@ -4,22 +4,27 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { clientName, clientPhone, deviceModel, description } = body;
+    const {
+      clientName,
+      clientPhone,
+      deviceModel,
+      description,
+      serialNumber,
+      notes,
+    } = body;
 
     if (!clientName || !clientPhone || !deviceModel || !description) {
       return NextResponse.json(
-        { error: "Усі поля є обов'язковими для заповнення!" },
+        { error: "Поля з * є обов'язковими для заповнення!" },
         { status: 400 },
       );
     }
 
     const newOrder = await prisma.order.create({
       data: {
-        clientName,
-        clientPhone,
-        deviceModel,
-        description,
-        status: "PENDING", // Статус за замовчуванням
+        ...body,
+        serialNumber: serialNumber?.trim() || null,
+        notes: notes?.trim() || null,
       },
     });
 

@@ -11,6 +11,9 @@ export default function CreateOrderPage() {
   const [clientPhone, setClientPhone] = useState("");
   const [deviceModel, setDeviceModel] = useState("");
   const [description, setDescription] = useState("");
+  const [serialNumber, setSerialNumber] = useState("");
+  const [estimatedPrice, setEstimatedPrice] = useState("");
+  const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -21,12 +24,18 @@ export default function CreateOrderPage() {
     setLoading(true);
     setMessage("");
 
+    const priceValue =
+      estimatedPrice.trim() !== "" ? Number(estimatedPrice) : null;
+
     try {
       const data = await createOrder({
         clientName: `${firstName} ${lastName}`,
         clientPhone,
         deviceModel,
         description,
+        estimatedPrice: priceValue,
+        serialNumber: serialNumber.trim() || null,
+        notes: notes.trim() || null,
       });
 
       console.log("Відповідь сервера:", data);
@@ -38,6 +47,12 @@ export default function CreateOrderPage() {
       setClientPhone("");
       setDeviceModel("");
       setDescription("");
+      setSerialNumber("");
+      setEstimatedPrice("");
+      setNotes("");
+
+      // Після успішного створення відправляємо майстра в адмінку
+      router.push("/dashboard");
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Сталася невідома помилка.";
@@ -45,8 +60,6 @@ export default function CreateOrderPage() {
       setMessage(`❌ Помилка: ${message}`);
     } finally {
       setLoading(false);
-      // Після успішного створення відправляємо майстра в адмінку
-      router.push("/dashboard");
     }
   };
 
@@ -163,6 +176,69 @@ export default function CreateOrderPage() {
               />
             </div>
           </div>
+
+          {/* СЕРІЙНИЙ НОМЕР ТА ЦІНА (у два стовпці на комп'ютері, в один на телефоні) */}
+          <div>
+            <label
+              htmlFor="serial-number"
+              className="block text-sm/6 font-semibold text-white"
+            >
+              Серійний номер / IMEI
+            </label>
+            <div className="mt-2.5">
+              <input
+                id="serial-number"
+                name="serial-number"
+                type="text"
+                placeholder="напр. SN12345678"
+                className="block w-full rounded-md bg-white/5 px-3.5 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
+                value={serialNumber}
+                onChange={(e) => setSerialNumber(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="estimated-price"
+              className="block text-sm/6 font-semibold text-white"
+            >
+              Орієнтовна ціна (грн)
+            </label>
+            <div className="mt-2.5">
+              <input
+                id="estimated-price"
+                name="estimated-price"
+                type="number"
+                placeholder="напр. 1500"
+                className="block w-full rounded-md bg-white/5 px-3.5 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
+                value={estimatedPrice}
+                onChange={(e) => setEstimatedPrice(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* ПРИХОВАНІ НОТАТКИ ДЛЯ МАЙСТРА (на всю ширину) */}
+          <div className="sm:col-span-2">
+            <label
+              htmlFor="notes"
+              className="block text-sm/6 font-semibold text-white"
+            >
+              Внутрішні нотатки для майстра (не видно клієнту)
+            </label>
+            <div className="mt-2.5">
+              <textarea
+                id="notes"
+                name="notes"
+                rows={2}
+                placeholder="напр. Клієнт просив обережно з екраном, є подряпини на кришці..."
+                className="block w-full rounded-md bg-white/5 px-3.5 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
+          </div>
+
           <div className="sm:col-span-2">
             <label
               htmlFor="description"

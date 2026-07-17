@@ -177,6 +177,8 @@ export default function OrderTable({ orders }: OrderTableProps) {
             clientPhone,
             deviceModel,
             description,
+            serialNumber,
+            estimatedPrice,
             status,
             createdAt,
           }) => (
@@ -199,8 +201,18 @@ export default function OrderTable({ orders }: OrderTableProps) {
                     <p className="mt-1 truncate text-sm text-slate-400">
                       {clientName}
                     </p>
+                    {serialNumber && (
+                      <p className="mt-0.5 text-xs text-slate-500 truncate">
+                        S/N: {serialNumber}
+                      </p>
+                    )}
                   </div>
                   <StatusBadge status={status} />
+                  {estimatedPrice && (
+                    <span className="inline-flex items-center justify-center rounded-md bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-400 ring-1 ring-inset ring-emerald-500/20 whitespace-nowrap">
+                      {estimatedPrice.toString()} грн
+                    </span>
+                  )}
                 </div>
                 <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-300">
                   {description}
@@ -237,6 +249,7 @@ export default function OrderTable({ orders }: OrderTableProps) {
               <th className="px-5 py-3">Клієнт</th>
               <th className="px-5 py-3">Телефон</th>
               <th className="px-5 py-3">Опис поломки</th>
+              <th className="px-5 py-3">Ціна (грн)</th>
               <th className="px-5 py-3">Статус</th>
               <th className="px-5 py-3">Дата</th>
             </tr>
@@ -249,6 +262,7 @@ export default function OrderTable({ orders }: OrderTableProps) {
                 clientPhone,
                 deviceModel,
                 description,
+                estimatedPrice,
                 status,
                 createdAt,
               }) => (
@@ -277,6 +291,9 @@ export default function OrderTable({ orders }: OrderTableProps) {
                   </td>
                   <td className="max-w-xs truncate px-5 py-4 text-slate-400">
                     {description}
+                  </td>
+                  <td className="px-5 py-4 font-medium text-emerald-400">
+                    {estimatedPrice ? `${estimatedPrice}` : "—"}
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
