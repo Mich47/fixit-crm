@@ -6,11 +6,21 @@ export type SerializedOrder = Omit<Order, "estimatedPrice" | "finalPrice"> & {
   finalPrice: string | null;
 };
 
-export async function getOrderById(id: string): Promise<Order | null> {
+const serializeOrder = (order: Order): SerializedOrder => ({
+  ...order,
+  estimatedPrice: order.estimatedPrice ? order.estimatedPrice.toString() : null,
+  finalPrice: order.finalPrice ? order.finalPrice.toString() : null,
+});
+
+export async function getOrderById(
+  id: string,
+): Promise<SerializedOrder | null> {
   try {
-    return await prisma.order.findUnique({
+    const rawOrder = await prisma.order.findUnique({
       where: { id },
     });
+
+    return rawOrder ? serializeOrder(rawOrder) : null;
   } catch (error) {
     console.error("Помилка серверного сервісу при пошуку замовлення:", error);
     throw new Error("Помилка бази даних при отриманні замовлення.");
@@ -34,8 +44,6 @@ export async function getFilteredOrders(
     ];
   }
 
-  console.log("whereCondition ", whereCondition);
-
   try {
     const rawOrders = await prisma.order.findMany({
       where: whereCondition,
@@ -43,13 +51,7 @@ export async function getFilteredOrders(
         createdAt: "desc",
       },
     });
-    return rawOrders.map((order) => ({
-      ...order,
-      estimatedPrice: order.estimatedPrice
-        ? order.estimatedPrice.toString()
-        : null,
-      finalPrice: order.finalPrice ? order.finalPrice.toString() : null,
-    }));
+    return rawOrders.map(serializeOrder);
   } catch (error) {
     console.error("Помилка серверного сервісу при пошуку за фільтром:", error);
     throw new Error("Помилка бази даних при отриманні замовлення за фільтром.");
