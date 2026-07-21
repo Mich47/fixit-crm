@@ -1,12 +1,12 @@
 "use client";
 
-import type { Order } from "@/generated/prisma/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { updateOrderStatus } from "../services/orderService";
+import { SerializedOrder } from "../services/orderServerService";
 
 interface OrderTableProps {
-  orders: Order[];
+  orders: SerializedOrder[];
 }
 
 // 🌟 Єдиний конфіг для назв та соковитих кольорів статусів
@@ -210,7 +210,7 @@ export default function OrderTable({ orders }: OrderTableProps) {
                   <StatusBadge status={status} />
                   {estimatedPrice && (
                     <span className="inline-flex items-center justify-center rounded-md bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-400 ring-1 ring-inset ring-emerald-500/20 whitespace-nowrap">
-                      {estimatedPrice.toString()} грн
+                      {estimatedPrice} грн
                     </span>
                   )}
                 </div>

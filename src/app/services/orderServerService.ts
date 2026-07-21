@@ -1,6 +1,11 @@
 import { prisma } from "@/lib/db";
 import type { Order } from "@/generated/prisma/client";
 
+export type SerializedOrder = Omit<Order, "estimatedPrice" | "finalPrice"> & {
+  estimatedPrice: string | null;
+  finalPrice: string | null;
+};
+
 export async function getOrderById(id: string): Promise<Order | null> {
   try {
     return await prisma.order.findUnique({
@@ -15,7 +20,7 @@ export async function getOrderById(id: string): Promise<Order | null> {
 export async function getFilteredOrders(
   search?: string,
   status?: string,
-): Promise<Order[]> {
+): Promise<SerializedOrder[]> {
   const whereCondition: Record<string, unknown> = {};
 
   if (status && status !== "ALL") {
@@ -32,12 +37,19 @@ export async function getFilteredOrders(
   console.log("whereCondition ", whereCondition);
 
   try {
-    return await prisma.order.findMany({
+    const rawOrders = await prisma.order.findMany({
       where: whereCondition,
       orderBy: {
         createdAt: "desc",
       },
     });
+    return rawOrders.map((order) => ({
+      ...order,
+      estimatedPrice: order.estimatedPrice
+        ? order.estimatedPrice.toString()
+        : null,
+      finalPrice: order.finalPrice ? order.finalPrice.toString() : null,
+    }));
   } catch (error) {
     console.error("Помилка серверного сервісу при пошуку за фільтром:", error);
     throw new Error("Помилка бази даних при отриманні замовлення за фільтром.");
