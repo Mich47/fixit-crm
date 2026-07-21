@@ -15,9 +15,6 @@ export default function DashboardFilters() {
 
   const [previousSearch, setPreviousSearch] = useState(currentSearch);
 
-  console.log("searchTerm ", searchTerm);
-  console.log("previousSearch ", previousSearch);
-
   if (currentSearch !== previousSearch) {
     setPreviousSearch(currentSearch);
     setSearchTerm(currentSearch);
