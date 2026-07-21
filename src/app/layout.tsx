@@ -28,7 +28,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body suppressHydrationWarning className="min-h-full flex flex-col">
         <Header />
         <main className="isolate bg-gray-900 px-6 py-24 sm:py-32 lg:px-8 flex-1">
           <div
