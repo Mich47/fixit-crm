@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getOrderById } from "@/app/services/orderServerService";
+import PdfDownloadButton from "./PdfDownloadButton";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -57,6 +58,8 @@ export default async function OrderDetailsPage({ params }: PageProps) {
         >
           ← До списку заявок
         </Link>
+        {/* Кнопка друку квитанції */}
+        <PdfDownloadButton order={order} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
